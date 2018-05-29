@@ -1,0 +1,149 @@
+<html>
+    <head>
+        <script src="simplex-noise.js"></script>
+        <style>
+            body {
+                margin: 0;
+                font-family: sans-serif;
+            }
+
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
+
+            #instructions {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                background-color: white;
+
+                transition: 1s;
+                -webkit-transition: 1s;
+            }
+
+            #padding {
+                padding-top: 40vh;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canv"></canvas>
+        <div id="instructions">
+            <div id="padding"></div>
+            Press space to pause
+            <br />
+            Click to switch to other modes
+        </div>
+
+        <script>
+            setTimeout(function() {
+                document.getElementById('instructions').style.opacity = '0';
+            }, 2000)
+
+            var canv = document.getElementById('canv');
+            var ctx = canv.getContext('2d');
+            ctx.font = '100px Arial';
+
+            var simplex = new SimplexNoise(/*Seed:*/Math.random()); // <- Setting the seed to something like 'hello' will mean that reloading the page will give you the same data
+
+            canv.width = window.innerWidth;
+            canv.height = window.innerHeight;
+
+            const inc = 0.01; // <- This is used by both 1D and 2D, it declares how much space is between each dot when generated from the noise function, it does not however effect how the points are displayed
+            const xoffInc = 0.01; // <- Speed the points move for the 1D examples (the 2D takes too long). This is usually best the same as 'inc'
+            const lines = true; // <- For the 1D examples, if false lines are not drawn to connect the dots
+            const points = true; // <- For the 1D examples, if false then the points are not displayed
+
+            var xoff = 0;
+
+            function twoD() {
+                for (var x = 0; x < canv.width; x++) {
+                    for (var y = 0; y < canv.height; y++) {
+                        var no = ((simplex.noise2D((x * inc), y * inc) + 1) / 2) * 255;
+                        ctx.fillStyle = 'rgb(' + no + ',' + no + ',' + no + ')';
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+
+                ctx.fillStyle = 'blue';
+                ctx.fillText('Two dimensional simplex noise', 10, 20);
+
+                return true;
+            }
+
+            function oneD() {
+                ctx.strokeStyle = 'grey';
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                for (var x = 0; x < canv.width; x++) {
+                    if (lines || points) var h = canv.height - (((simplex.noise2D((x * inc) + xoff, 0) + 1) / 2 ) * canv.height);
+                    if (lines) ctx.lineTo(x, h);
+                    if (points) ctx.fillRect(x - 1, h - 1, 2, 2);
+                }
+                ctx.stroke();
+
+                ctx.fillText('One dimensional simplex noise (Each dot is a generated point)', 10, 20);
+            }
+
+            function random() {
+                ctx.strokeStyle = 'grey';
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+
+                for (var x = 0; x < canv.width; x++) {
+                    if (lines || points) var h = canv.height - (Math.random() * canv.height);
+                    if (lines) ctx.lineTo(x, h);
+                    if (points) ctx.fillRect(x - 1, h - 1, 2, 2);
+                }
+                ctx.stroke();
+
+                ctx.fillText('One dimensional completely random points (Each dot is a generated point)', 10, 20);
+            }
+
+            var mode = 0;
+            const types = [
+                oneD,
+                twoD,
+                random
+            ];
+            var update = true;
+
+            document.addEventListener('click', function() {
+                mode = (mode + 1) % types.length;
+                update = true;
+            });
+
+            document.addEventListener('keyup', function(event) {
+                if (event.keyCode == 32)
+                    update = !update;
+            });
+
+            window.onresize = function() {
+                canv.width = window.innerWidth;
+                canv.height = window.innerHeight;
+                update = true;                
+            };
+
+            function draw() {
+                if (update) {
+                    ctx.clearRect(0, 0, canv.width, canv.height);
+
+                    if (types[mode]()) update = false;
+
+                    ctx.fillText('Look at the page code for more options!', canv.width - 200, canv.height - 15);
+
+                    xoff += xoffInc;
+                }
+                
+
+                requestAnimationFrame(draw);
+            }
+
+            requestAnimationFrame(draw);
+        </script>
+    </body>
+</html>
