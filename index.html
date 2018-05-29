@@ -53,10 +53,10 @@
             canv.width = window.innerWidth;
             canv.height = window.innerHeight;
 
-            const inc = 0.01; // <- This is used by both 1D and 2D, it declares how much space is between each dot when generated from the noise function, it does not however effect how the points are displayed
-            const xoffInc = 0.01; // <- Speed the points move for the 1D examples (the 2D takes too long). This is usually best the same as 'inc'
-            const lines = true; // <- For the 1D examples, if false lines are not drawn to connect the dots
-            const points = true; // <- For the 1D examples, if false then the points are not displayed
+            var inc = 0.01; // <- This is used by both 1D and 2D, it declares how much space is between each dot when generated from the noise function, it does not however effect how the points are displayed
+            var xoffInc = 0.01; // <- Speed the points move for the 1D examples (the 2D takes too long). This is usually best the same as 'inc'
+            var lines = true; // <- For the 1D examples, if false lines are not drawn to connect the dots
+            var points = true; // <- For the 1D examples, if false then the points are not displayed
 
             var xoff = 0;
 
